@@ -2,7 +2,7 @@
   "name": "ass3",
   "version": "1.0.0",
   "description": "For COMP-1537 - Assignment #3",
-  "main": "./Backend/server.js",
+  "main": "/Backend/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
