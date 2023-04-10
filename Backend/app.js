@@ -61,22 +61,31 @@ app.post('/search', async (req, res) => {
         res.json(result);
 
     } else if (req.body.type === "setFilters") {
-        var selectionArgument = {}
+        var selectionArgument = {};
+        var selectionQueryArray = [];
+
         if (req.body.name) {
-            selectionArgument = { name: req.body.name, }
+            selectionQueryArray.push({ name: req.body.name });
         }
-        if (req.body.type === 'weightSearch') {
-            if (req.body.minWeight && req.body.maxWeight) {
-                selectionArgument = { weight: { $gte: req.body.minWeight, $lte: req.body.maxWeight } }
-            } else if (req.body.minWeight) {
-                selectionArgument = { weight: { $gte: req.body.minWeight } }
-            } else if (req.body.maxWeight) {
-                selectionArgument = { weight: { $lte: req.body.maxWeight } }
-            }
+
+        if (req.body.minWeight && req.body.maxWeight) {
+            selectionQueryArray.push({
+                weight: { $gte: req.body.minWeight, $lte: req.body.maxWeight },
+            });
+        } else if (req.body.minWeight) {
+            selectionQueryArray.push({ weight: { $gte: req.body.minWeight } });
+        } else if (req.body.maxWeight) {
+            selectionQueryArray.push({ weight: { $lte: req.body.maxWeight } });
         }
-        if (req.body.loves) {
-            selectionArgument = { loves: { $all: req.body.loves } }
+
+        if (req.body.loves && req.body.loves.length > 0) {
+            selectionQueryArray.push({ loves: { $all: req.body.loves } });
         }
+
+        if (selectionQueryArray) {
+            selectionArgument = { $and: selectionQueryArray };
+        }
+
         var projectionArgument = projectionFilters();
         const result = await unicornModel.find(selectionArgument, projectionArgument);
         res.json(result);
